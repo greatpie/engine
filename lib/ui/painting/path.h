@@ -6,11 +6,13 @@
 #define FLUTTER_LIB_UI_PAINTING_PATH_H_
 
 #include "flutter/lib/ui/painting/rrect.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_wrappable.h"
 #include "lib/tonic/typed_data/float32_list.h"
 #include "lib/tonic/typed_data/float64_list.h"
 #include "third_party/skia/include/core/SkPath.h"
 #include "third_party/skia/include/pathops/SkPathOps.h"
+#include "third_party/skia/include/utils/SkParsePath.h"
 
 namespace tonic {
 class DartLibraryNatives;
@@ -34,6 +36,8 @@ class CanvasPath : public fxl::RefCountedThreadSafe<CanvasPath>,
     path->path_ = src;
     return path;
   }
+
+  static fxl::RefPtr<CanvasPath> ParseSvgPathData(const std::string& svgPathData);
 
   int getFillType();
   void setFillType(int fill_type);
@@ -102,7 +106,7 @@ class CanvasPath : public fxl::RefCountedThreadSafe<CanvasPath>,
   tonic::Float32List getBounds();
   bool op(CanvasPath* path1, CanvasPath* path2, int operation);
   fxl::RefPtr<CanvasPath> clone();
-
+  
   const SkPath& path() const { return path_; }
 
   static void RegisterNatives(tonic::DartLibraryNatives* natives);

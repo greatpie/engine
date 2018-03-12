@@ -1390,6 +1390,11 @@ class Path extends NativeFieldWrapperClass2 {
   }
   Path _clone() native 'Path_clone';
 
+  static Path parseSvgPathData(String svgPathData) {
+    return _parseSvgPathData(svgPathData); 
+  }
+  static Path _parseSvgPathData(String svgPathData) native 'Path_ParseSvgPathData';
+
   /// Determines how the interior of this path is calculated.
   ///
   /// Defaults to the non-zero winding rule, [PathFillType.nonZero].
