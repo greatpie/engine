@@ -37,8 +37,6 @@ class CanvasPath : public fxl::RefCountedThreadSafe<CanvasPath>,
     return path;
   }
 
-  static fxl::RefPtr<CanvasPath> ParseSvgPathData(const std::string& svgPathData);
-
   int getFillType();
   void setFillType(int fill_type);
 
@@ -106,7 +104,8 @@ class CanvasPath : public fxl::RefCountedThreadSafe<CanvasPath>,
   tonic::Float32List getBounds();
   bool op(CanvasPath* path1, CanvasPath* path2, int operation);
   fxl::RefPtr<CanvasPath> clone();
-  
+  bool setFromSvgPathData(const std::string& svgPathData);
+
   const SkPath& path() const { return path_; }
 
   static void RegisterNatives(tonic::DartLibraryNatives* natives);

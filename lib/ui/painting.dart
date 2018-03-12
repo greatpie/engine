@@ -1390,10 +1390,17 @@ class Path extends NativeFieldWrapperClass2 {
   }
   Path _clone() native 'Path_clone';
 
-  static Path parseSvgPathData(String svgPathData) {
-    return _parseSvgPathData(svgPathData); 
+  static Path parseSvgPathData(String svgPathData, {Path onError(String source)}) {
+    Path path = new Path();
+    if (path._setFromSvgPathData(svgPathData)) {
+      return path;
+    } else if (onError != null) {
+      return onError(svgPathData);
+    }
+
+    throw new FormatException("Unable to parse path data");
   }
-  static Path _parseSvgPathData(String svgPathData) native 'Path_ParseSvgPathData';
+  bool _setFromSvgPathData(String svgPathData) native 'Path_setFromSvgPathData';
 
   /// Determines how the interior of this path is calculated.
   ///

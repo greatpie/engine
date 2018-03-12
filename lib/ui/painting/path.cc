@@ -24,9 +24,6 @@ static void Path_constructor(Dart_NativeArguments args) {
 
 IMPLEMENT_WRAPPERTYPEINFO(ui, Path);
 
-#define FOR_EACH_STATIC_BINDING(V)   \
-  V(Path, ParseSvgPathData)
-
 #define FOR_EACH_BINDING(V)          \
   V(Path, addArc)                    \
   V(Path, addOval)                   \
@@ -58,14 +55,13 @@ IMPLEMENT_WRAPPERTYPEINFO(ui, Path);
   V(Path, getBounds)                 \
   V(Path, addPathWithMatrix)         \
   V(Path, op)                        \
-  V(Path, clone)
+  V(Path, clone)                     \
+  V(Path, setFromSvgPathData)
 
-FOR_EACH_STATIC_BINDING(DART_NATIVE_CALLBACK_STATIC)
 FOR_EACH_BINDING(DART_NATIVE_CALLBACK)
 
 void CanvasPath::RegisterNatives(tonic::DartLibraryNatives* natives) {
   natives->Register({{"Path_constructor", Path_constructor, 1, true},
-                     FOR_EACH_STATIC_BINDING(DART_REGISTER_NATIVE_STATIC),
                      FOR_EACH_BINDING(DART_REGISTER_NATIVE)});
 }
 
@@ -294,14 +290,11 @@ fxl::RefPtr<CanvasPath> CanvasPath::clone() {
   return path;
 }
 
-fxl::RefPtr<CanvasPath> CanvasPath::ParseSvgPathData(const std::string& svgPathData)
+bool CanvasPath::setFromSvgPathData(const std::string& svgPathData)
 {
-  fxl::RefPtr<CanvasPath> path = CanvasPath::Create();
-  bool success = SkParsePath::FromSVGString(svgPathData.c_str(), &path->path_);
-  if (!success) {
-    Dart_ThrowException(tonic::ToDart("Could not process SVG Path Data"));
-  }
-  return path;
+  path_.reset();
+  bool success = SkParsePath::FromSVGString(svgPathData.c_str(), &path_);
+  return success;
 }
 
 }  // namespace blink
