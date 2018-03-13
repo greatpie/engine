@@ -56,7 +56,8 @@ IMPLEMENT_WRAPPERTYPEINFO(ui, Path);
   V(Path, addPathWithMatrix)         \
   V(Path, op)                        \
   V(Path, clone)                     \
-  V(Path, setFromSvgPathData)
+  V(Path, setFromSvgPathData)        \
+  V(Path, toSvgString)
 
 FOR_EACH_BINDING(DART_NATIVE_CALLBACK)
 
@@ -295,6 +296,12 @@ bool CanvasPath::setFromSvgPathData(const std::string& svgPathData)
   path_.reset();
   bool success = SkParsePath::FromSVGString(svgPathData.c_str(), &path_);
   return success;
+}
+
+Dart_Handle CanvasPath::toSvgString() {
+  SkString str;
+  SkParsePath::ToSVGString(path_, &str);
+  return ToDart(str.c_str());
 }
 
 }  // namespace blink

@@ -1705,6 +1705,12 @@ class Path extends NativeFieldWrapperClass2 {
   PathMetrics computeMetrics({bool forceClosed = false}) {
     return new PathMetrics._(new Path.from(this), forceClosed);
   }
+
+  @override
+  String toString() {
+    return 'Path(${_toSvgString()})';
+  }
+  String _toSvgString() native 'Path_toSvgString';
 }
 
 /// Exception thrown by [Path.combine] if a failure occurs.

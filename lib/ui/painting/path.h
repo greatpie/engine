@@ -11,8 +11,10 @@
 #include "lib/tonic/typed_data/float32_list.h"
 #include "lib/tonic/typed_data/float64_list.h"
 #include "third_party/skia/include/core/SkPath.h"
+#include "third_party/skia/include/core/SkString.h"
 #include "third_party/skia/include/pathops/SkPathOps.h"
 #include "third_party/skia/include/utils/SkParsePath.h"
+
 
 namespace tonic {
 class DartLibraryNatives;
@@ -105,6 +107,7 @@ class CanvasPath : public fxl::RefCountedThreadSafe<CanvasPath>,
   bool op(CanvasPath* path1, CanvasPath* path2, int operation);
   fxl::RefPtr<CanvasPath> clone();
   bool setFromSvgPathData(const std::string& svgPathData);
+  Dart_Handle toSvgString();
 
   const SkPath& path() const { return path_; }
 
