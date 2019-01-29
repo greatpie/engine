@@ -341,6 +341,7 @@ FlutterResult FlutterEngineRun(size_t version,
 
   settings.icu_data_path = icu_data_path;
   settings.assets_path = args->assets_path;
+  settings.assets_dir = args->assets_path;
 
   if (!blink::DartVM::IsRunningPrecompiledCode()) {
     // Verify the assets path contains Dart 2 kernel assets.
