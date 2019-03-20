@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef FLUTTER_LIB_UI_PAINTING_SKOTTIE_H_
-#define FLUTTER_LIB_UI_PAINTING_SKOTTIE_H_
+#ifndef FLUTTER_LIB_UI_PAINTING_LOTTIE_H_
+#define FLUTTER_LIB_UI_PAINTING_LOTTIE_H_
 
 #include "flutter/lib/ui/dart_wrapper.h"
 #include "flutter/lib/ui/painting/canvas.h"
@@ -11,16 +11,16 @@
 
 namespace blink {
 
-class SkottieAnimation : public RefCountedDartWrappable<SkottieAnimation> {
+class LottieAnimation : public RefCountedDartWrappable<LottieAnimation> {
   DEFINE_WRAPPERTYPEINFO();
-  FML_FRIEND_MAKE_REF_COUNTED(SkottieAnimation);
+  FML_FRIEND_MAKE_REF_COUNTED(LottieAnimation);
 
  public:
-  ~SkottieAnimation() override;
+  ~LottieAnimation() override;
 
-static fml::RefPtr<SkottieAnimation> Create(const std::string& data) {
-  fml::RefPtr<SkottieAnimation> animation =
-      fml::MakeRefCounted<SkottieAnimation>();
+static fml::RefPtr<LottieAnimation> Create(const std::string& data) {
+  fml::RefPtr<LottieAnimation> animation =
+      fml::MakeRefCounted<LottieAnimation>();
   animation->animation_ = skottie::Animation::Make(data.c_str(), data.length());
   return animation;
 }
@@ -34,10 +34,10 @@ static fml::RefPtr<SkottieAnimation> Create(const std::string& data) {
   static void RegisterNatives(tonic::DartLibraryNatives* natives);
 
  private:
-  SkottieAnimation();
+  LottieAnimation();
   sk_sp<skottie::Animation> animation_;
 };
 
 }  // namespace blink
 
-#endif  // FLUTTER_LIB_UI_PAINTING_SKOTTIE_H_
+#endif  // FLUTTER_LIB_UI_PAINTING_LOTTIE_H_

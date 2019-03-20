@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "flutter/lib/ui/painting/skottie.h"
+#include "flutter/lib/ui/painting/lottie.h"
 
 #include "third_party/tonic/dart_args.h"
 #include "third_party/tonic/dart_binding_macros.h"
@@ -10,29 +10,29 @@
 
 namespace blink {
 
-static void SkottieAnimation_constructor(Dart_NativeArguments args) {
-  DartCallConstructor(&SkottieAnimation::Create, args);
+static void LottieAnimation_constructor(Dart_NativeArguments args) {
+  DartCallConstructor(&LottieAnimation::Create, args);
 }
 
-IMPLEMENT_WRAPPERTYPEINFO(ui, SkottieAnimation);
+IMPLEMENT_WRAPPERTYPEINFO(ui, LottieAnimation);
 
 #define FOR_EACH_BINDING(V)       \
-  V(SkottieAnimation, drawFrame)  \
-  V(SkottieAnimation, duration)
+  V(LottieAnimation, drawFrame)  \
+  V(LottieAnimation, duration)
 
 FOR_EACH_BINDING(DART_NATIVE_CALLBACK)
 
-void SkottieAnimation::RegisterNatives(tonic::DartLibraryNatives* natives) {
+void LottieAnimation::RegisterNatives(tonic::DartLibraryNatives* natives) {
   natives->Register(
-      {{"SkottieAnimation_constructor", SkottieAnimation_constructor, 2, true},
+      {{"LottieAnimation_constructor", LottieAnimation_constructor, 2, true},
        FOR_EACH_BINDING(DART_REGISTER_NATIVE)});
 }
 
-SkottieAnimation::SkottieAnimation() {}
+LottieAnimation::LottieAnimation() {}
 
-SkottieAnimation::~SkottieAnimation() {}
+LottieAnimation::~LottieAnimation() {}
 
-void SkottieAnimation::drawFrame(const Canvas* canvas,
+void LottieAnimation::drawFrame(const Canvas* canvas,
                                  double progress,
                                  double height,
                                  double width) {
@@ -47,7 +47,7 @@ void SkottieAnimation::drawFrame(const Canvas* canvas,
   animation_->render(skia_canvas, &bounds);
 }
 
-double SkottieAnimation::duration() {
+double LottieAnimation::duration() {
   return animation_->duration();
 }
 

@@ -13,7 +13,7 @@ class LottieAnimation extends NativeFieldWrapperClass2 {
   LottieAnimation(String json) : assert(json != null) {
     _constructor(json);
   }
-  void _constructor(String json) native 'SkottieAnimation_constructor';
+  void _constructor(String json) native 'LottieAnimation_constructor';
 
   void drawFrame(Canvas canvas, double progress, double width, double height) {
     assert(canvas != null);
@@ -22,7 +22,7 @@ class LottieAnimation extends NativeFieldWrapperClass2 {
     assert(height != null && height > 0);
     _drawFrame(canvas, progress, width, height);
   }
-  void _drawFrame(Canvas canvas, double progress, double width, double height) native 'SkottieAnimation_drawFrame';
+  void _drawFrame(Canvas canvas, double progress, double width, double height) native 'LottieAnimation_drawFrame';
 
-  double get duration native 'SkottieAnimation_duration';
+  double get duration native 'LottieAnimation_duration';
 }
