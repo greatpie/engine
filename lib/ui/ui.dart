@@ -28,6 +28,7 @@ part 'hash_codes.dart';
 part 'hooks.dart';
 part 'isolate_name_server.dart';
 part 'lerp.dart';
+part 'lottie.dart';
 part 'natives.dart';
 part 'painting.dart';
 part 'plugins.dart';

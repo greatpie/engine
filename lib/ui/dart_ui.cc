@@ -21,6 +21,7 @@
 #include "flutter/lib/ui/painting/path_measure.h"
 #include "flutter/lib/ui/painting/picture.h"
 #include "flutter/lib/ui/painting/picture_recorder.h"
+#include "flutter/lib/ui/painting/skottie.h"
 #include "flutter/lib/ui/painting/vertices.h"
 #include "flutter/lib/ui/semantics/semantics_update.h"
 #include "flutter/lib/ui/semantics/semantics_update_builder.h"
@@ -88,6 +89,7 @@ void DartUI::InitForGlobal() {
     SceneHost::RegisterNatives(g_natives);
     SemanticsUpdate::RegisterNatives(g_natives);
     SemanticsUpdateBuilder::RegisterNatives(g_natives);
+    SkottieAnimation::RegisterNatives(g_natives);
     Versions::RegisterNatives(g_natives);
     Vertices::RegisterNatives(g_natives);
     Window::RegisterNatives(g_natives);

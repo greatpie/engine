@@ -54,6 +54,8 @@ source_set("ui") {
     "painting/rrect.h",
     "painting/shader.cc",
     "painting/shader.h",
+    "painting/skottie.cc",
+    "painting/skottie.h",
     "painting/vertices.cc",
     "painting/vertices.h",
     "plugins/callback_cache.cc",
@@ -113,6 +115,7 @@ source_set("ui") {
     "//third_party/dart/runtime/bin:dart_io_api",
     "//third_party/rapidjson",
     "//third_party/skia",
+    "//third_party/skia/modules/skottie:skottie",
     "//third_party/tonic",
   ]
   if (is_fuchsia) {
