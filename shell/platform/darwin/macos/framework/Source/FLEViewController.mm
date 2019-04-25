@@ -16,12 +16,6 @@ static NSString* const kICUBundlePath = @"icudtl.dat";
 
 static const int kDefaultWindowFramebuffer = 0;
 
-// Android KeyEvent constants from https://developer.android.com/reference/android/view/KeyEvent
-static const int kAndroidMetaStateShift = 1 << 0;
-static const int kAndroidMetaStateAlt = 1 << 1;
-static const int kAndroidMetaStateCtrl = 1 << 12;
-static const int kAndroidMetaStateMeta = 1 << 16;
-
 #pragma mark - Private interface declaration.
 
 /**
@@ -257,13 +251,6 @@ static void CommonInit(FLEViewController* controller) {
                              commandLineArguments:arguments];
 }
 
-- (id<FLEPluginRegistrar>)registrarForPlugin:(NSString*)pluginName {
-  // Currently, the view controller acts as the registrar for all plugins, so the
-  // name is ignored. It is part of the API to reduce churn in the future when
-  // aligning more closely with the Flutter registrar system.
-  return self;
-}
-
 #pragma mark - Framework-internal methods
 
 - (void)addKeyResponder:(NSResponder*)responder {
@@ -476,14 +463,12 @@ static void CommonInit(FLEViewController* controller) {
 
 - (void)dispatchKeyEvent:(NSEvent*)event ofType:(NSString*)type {
   [_keyEventChannel sendMessage:@{
-    @"keymap" : @"android",
+    @"keymap" : @"macos",
     @"type" : type,
     @"keyCode" : @(event.keyCode),
-    @"metaState" :
-        @(((event.modifierFlags & NSEventModifierFlagShift) ? kAndroidMetaStateShift : 0) |
-          ((event.modifierFlags & NSEventModifierFlagOption) ? kAndroidMetaStateAlt : 0) |
-          ((event.modifierFlags & NSEventModifierFlagControl) ? kAndroidMetaStateCtrl : 0) |
-          ((event.modifierFlags & NSEventModifierFlagCommand) ? kAndroidMetaStateMeta : 0))
+    @"modifiers" : @(event.modifierFlags),
+    @"characters" : event.characters,
+    @"charactersIgnoringModifiers" : event.charactersIgnoringModifiers,
   }];
 }
 
@@ -535,6 +520,14 @@ static void CommonInit(FLEViewController* controller) {
   [channel setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
     [delegate handleMethodCall:call result:result];
   }];
+}
+
+#pragma mark - FLEPluginRegistry
+
+- (id<FLEPluginRegistrar>)registrarForPlugin:(NSString*)pluginName {
+  // Currently, the view controller acts as the registrar for all plugins, so the
+  // name is ignored.
+  return self;
 }
 
 #pragma mark - NSResponder

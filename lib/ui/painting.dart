@@ -23,13 +23,13 @@ part of dart.ui;
 
 bool _rectIsValid(Rect rect) {
   assert(rect != null, 'Rect argument was null.');
-  assert(!rect._value.any((double value) => value.isNaN), 'Rect argument contained a NaN value.');
+  assert(!rect.hasNaN, 'Rect argument contained a NaN value.');
   return true;
 }
 
 bool _rrectIsValid(RRect rrect) {
   assert(rrect != null, 'RRect argument was null.');
-  assert(!rrect._value.any((double value) => value.isNaN), 'RRect argument contained a NaN value.');
+  assert(!rrect.hasNaN, 'RRect argument contained a NaN value.');
   return true;
 }
 
@@ -1520,6 +1520,11 @@ class _ImageInfo {
 ///
 /// To draw an [Image], use one of the methods on the [Canvas] class, such as
 /// [Canvas.drawImage].
+///
+/// See also:
+///
+///  * [Image](https://api.flutter.dev/flutter/widgets/Image-class.html), the class in the [widgets] library.
+///
 @pragma('vm:entry-point')
 class Image extends NativeFieldWrapperClass2 {
   // This class is created by the engine, and should not be instantiated
@@ -2023,7 +2028,7 @@ class Path extends NativeFieldWrapperClass2 {
   /// argument.
   void addRRect(RRect rrect) {
     assert(_rrectIsValid(rrect));
-    _addRRect(rrect._value);
+    _addRRect(rrect._value32);
   }
   void _addRRect(Float32List rrect) native 'Path_addRRect';
 
@@ -2252,7 +2257,9 @@ class PathMetricIterator implements Iterator<PathMetric> {
 /// iterator is at the contour for which they were created. It will also only be
 /// valid for the path as it was specified when [Path.computeMetrics] was called.
 /// If additional contours are added or any contours are updated, the metrics
-/// need to be recomputed.
+/// need to be recomputed. Previously created metrics will still refer to a
+/// snapshot of the path at the time they were computed, rather than to the
+/// actual metrics for the new mutations to the path.
 class PathMetric {
   PathMetric._(this._measure)
     : assert(_measure != null),
@@ -2359,9 +2366,6 @@ class _PathMeasure extends NativeFieldWrapperClass2 {
   //
   // A path can have a next contour if [Path.moveTo] was called after drawing began.
   // Return true if one exists, or false.
-  //
-  // Before Skia introduced an SkPathContourMeasureIter, this didn't work like
-  // a normal iterator.  Now it does.
   bool _nextContour() {
     final bool next = _nativeNextContour();
     if (next) {
@@ -2678,6 +2682,11 @@ Float32List _encodeTwoPoints(Offset pointA, Offset pointB) {
 ///
 /// There are several types of gradients, represented by the various constructors
 /// on this class.
+///
+/// See also:
+///
+///  * [Gradient](https://api.flutter.dev/flutter/painting/Gradient-class.html), the class in the [painting] library.
+///
 class Gradient extends Shader {
 
   void _constructor() native 'Gradient_constructor';
@@ -2904,12 +2913,13 @@ class Vertices extends NativeFieldWrapperClass2 {
     final Int32List encodedColors = colors != null
       ? _encodeColorList(colors)
       : null;
-    final Int32List encodedIndices = indices != null
-      ? new Int32List.fromList(indices)
+    final Uint16List encodedIndices = indices != null
+      ? new Uint16List.fromList(indices)
       : null;
 
     _constructor();
-    _init(mode.index, encodedPositions, encodedTextureCoordinates, encodedColors, encodedIndices);
+    if (!_init(mode.index, encodedPositions, encodedTextureCoordinates, encodedColors, encodedIndices))
+      throw new ArgumentError('Invalid configuration for vertices.');
   }
 
   Vertices.raw(
@@ -2917,7 +2927,7 @@ class Vertices extends NativeFieldWrapperClass2 {
     Float32List positions, {
     Float32List textureCoordinates,
     Int32List colors,
-    Int32List indices,
+    Uint16List indices,
   }) : assert(mode != null),
        assert(positions != null) {
     if (textureCoordinates != null && textureCoordinates.length != positions.length)
@@ -2928,16 +2938,17 @@ class Vertices extends NativeFieldWrapperClass2 {
       throw new ArgumentError('"indices" values must be valid indices in the positions list.');
 
     _constructor();
-    _init(mode.index, positions, textureCoordinates, colors, indices);
+    if (!_init(mode.index, positions, textureCoordinates, colors, indices))
+      throw new ArgumentError('Invalid configuration for vertices.');
   }
 
   void _constructor() native 'Vertices_constructor';
 
-  void _init(int mode,
+  bool _init(int mode,
              Float32List positions,
              Float32List textureCoordinates,
              Int32List colors,
-             Int32List indices) native 'Vertices_init';
+             Uint16List indices) native 'Vertices_init';
 }
 
 /// Defines how a list of points is interpreted when drawing a set of points.
@@ -3250,7 +3261,7 @@ class Canvas extends NativeFieldWrapperClass2 {
   void clipRRect(RRect rrect, {bool doAntiAlias = true}) {
     assert(_rrectIsValid(rrect));
     assert(doAntiAlias != null);
-    _clipRRect(rrect._value, doAntiAlias);
+    _clipRRect(rrect._value32, doAntiAlias);
   }
   void _clipRRect(Float32List rrect, bool doAntiAlias) native 'Canvas_clipRRect';
 
@@ -3327,7 +3338,7 @@ class Canvas extends NativeFieldWrapperClass2 {
   void drawRRect(RRect rrect, Paint paint) {
     assert(_rrectIsValid(rrect));
     assert(paint != null);
-    _drawRRect(rrect._value, paint._objects, paint._data);
+    _drawRRect(rrect._value32, paint._objects, paint._data);
   }
   void _drawRRect(Float32List rrect,
                   List<dynamic> paintObjects,
@@ -3342,7 +3353,7 @@ class Canvas extends NativeFieldWrapperClass2 {
     assert(_rrectIsValid(outer));
     assert(_rrectIsValid(inner));
     assert(paint != null);
-    _drawDRRect(outer._value, inner._value, paint._objects, paint._data);
+    _drawDRRect(outer._value32, inner._value32, paint._objects, paint._data);
   }
   void _drawDRRect(Float32List outer,
                    Float32List inner,
@@ -3642,7 +3653,7 @@ class Canvas extends NativeFieldWrapperClass2 {
     }
 
     final Int32List colorBuffer = colors.isEmpty ? null : _encodeColorList(colors);
-    final Float32List cullRectBuffer = cullRect?._value;
+    final Float32List cullRectBuffer = cullRect?._value32;
 
     _drawAtlas(
       paint._objects, paint._data, atlas, rstTransformBuffer, rectBuffer,
@@ -3689,7 +3700,7 @@ class Canvas extends NativeFieldWrapperClass2 {
 
     _drawAtlas(
       paint._objects, paint._data, atlas, rstTransforms, rects,
-      colors, blendMode.index, cullRect?._value
+      colors, blendMode.index, cullRect?._value32
     );
   }
 

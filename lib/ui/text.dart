@@ -63,7 +63,8 @@ class FontWeight {
   /// Rather than using fractional weights, the interpolation rounds to the
   /// nearest weight.
   ///
-  /// Any null values for `a` or `b` are interpreted as equivalent to [normal]
+  /// If both `a` and `b` are null, then this method will return null. Otherwise,
+  /// any null values for `a` or `b` are interpreted as equivalent to [normal]
   /// (also known as [w400]).
   ///
   /// The `t` argument represents position on the timeline, with 0.0 meaning
@@ -80,6 +81,8 @@ class FontWeight {
   /// an [AnimationController].
   static FontWeight lerp(FontWeight a, FontWeight b, double t) {
     assert(t != null);
+    if (a == null && b == null)
+      return null;
     return values[lerpDouble(a?.index ?? normal.index, b?.index ?? normal.index, t).round().clamp(0, 8)];
   }
 
@@ -352,6 +355,11 @@ Int32List _encodeTextStyle(
 }
 
 /// An opaque object that determines the size, position, and rendering of text.
+///
+/// See also:
+///
+///  * [TextStyle](https://api.flutter.dev/flutter/painting/TextStyle-class.html), the class in the [painting] library.
+///
 class TextStyle {
   /// Creates a new TextStyle object.
   ///
@@ -792,6 +800,10 @@ ByteData _encodeStrut(
   return ByteData.view(data.buffer, 0,  byteCount);
 }
 
+/// See also:
+///
+///  * [StrutStyle](https://api.flutter.dev/flutter/painting/StrutStyle-class.html), the class in the [painting] library.
+///
 class StrutStyle {
   /// Creates a new StrutStyle object.
   ///
@@ -1302,6 +1314,12 @@ class Paragraph extends NativeFieldWrapperClass2 {
   ///
   /// Valid only after [layout] has been called.
   double get height native 'Paragraph_height';
+
+  /// The distance from the left edge of the leftmost glyph to the right edge of
+  /// the rightmost glyph in the paragraph.
+  ///
+  /// Valid only after [layout] has been called.
+  double get tightWidth native 'Paragraph_tightWidth';
 
   /// The minimum width that this paragraph could be without failing to paint
   /// its contents within itself.

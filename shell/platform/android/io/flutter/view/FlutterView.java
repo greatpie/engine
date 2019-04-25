@@ -7,6 +7,7 @@ package io.flutter.view;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -15,7 +16,6 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Handler;
 import android.os.LocaleList;
-import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
@@ -28,8 +28,8 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import io.flutter.app.FlutterPluginRegistry;
 import io.flutter.embedding.engine.FlutterJNI;
-import io.flutter.embedding.engine.android.AndroidKeyProcessor;
-import io.flutter.embedding.engine.android.AndroidTouchProcessor;
+import io.flutter.embedding.android.AndroidKeyProcessor;
+import io.flutter.embedding.android.AndroidTouchProcessor;
 import io.flutter.embedding.engine.dart.DartExecutor;
 import io.flutter.embedding.engine.renderer.FlutterRenderer;
 import io.flutter.embedding.engine.systemchannels.AccessibilityChannel;
@@ -43,6 +43,7 @@ import io.flutter.embedding.engine.systemchannels.SystemChannel;
 import io.flutter.plugin.common.*;
 import io.flutter.plugin.editing.TextInputPlugin;
 import io.flutter.plugin.platform.PlatformPlugin;
+import io.flutter.plugin.platform.PlatformViewsController;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -129,7 +130,11 @@ public class FlutterView extends SurfaceView implements BinaryMessenger, Texture
     public FlutterView(Context context, AttributeSet attrs, FlutterNativeView nativeView) {
         super(context, attrs);
 
-        Activity activity = (Activity) getContext();
+        Activity activity = getActivity(getContext());
+        if (activity == null) {
+            throw new IllegalArgumentException("Bad context");
+        }
+
         if (nativeView == null) {
             mNativeView = new FlutterNativeView(activity.getApplicationContext());
         } else {
@@ -190,6 +195,20 @@ public class FlutterView extends SurfaceView implements BinaryMessenger, Texture
         // Send initial platform information to Dart
         sendLocalesToDart(getResources().getConfiguration());
         sendUserPlatformSettingsToDart();
+    }
+    
+    private static Activity getActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof Activity) {
+            return (Activity) context;
+        }
+        if (context instanceof ContextWrapper) {
+            // Recurse up chain of base contexts until we find an Activity.
+            return getActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
     }
 
     @Override
@@ -346,7 +365,7 @@ public class FlutterView extends SurfaceView implements BinaryMessenger, Texture
         if (!isAttached())
             return null;
         getHolder().removeCallback(mSurfaceCallback);
-        mNativeView.detach();
+        mNativeView.detachFromFlutterView();
 
         FlutterNativeView view = mNativeView;
         mNativeView = null;
@@ -660,11 +679,13 @@ public class FlutterView extends SurfaceView implements BinaryMessenger, Texture
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        PlatformViewsController platformViewsController = getPluginRegistry().getPlatformViewsController();
         mAccessibilityNodeProvider = new AccessibilityBridge(
             this,
             new AccessibilityChannel(dartExecutor, getFlutterNativeView().getFlutterJNI()),
             (AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE),
-            getContext().getContentResolver()
+            getContext().getContentResolver(),
+            platformViewsController
         );
         mAccessibilityNodeProvider.setOnAccessibilityChangeListener(onAccessibilityChangeListener);
 
